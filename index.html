@@ -1,0 +1,109 @@
+<head>
+    <title>
+        ToDo
+    </title>
+</head>
+<script>
+
+    function deleteDone(id) {
+        console.log("delete done")
+        var taskElement = document.getElementById("task_" + id);
+        if (taskElement) {
+            taskElement.remove();
+        }
+        window.location.reload();
+    }
+    function deleteTask(id) {
+        fetch("http://localhost:3000/todo/" + id, {
+            method: "DELETE",
+        }).then(deleteDone)
+    }
+
+    function showData(data) {
+        var parentElement = document.getElementById("mainArea")
+
+        for (var i = 0; i < data.length; i++) {
+            var childElement = document.createElement("div")
+            childElement.id = "task_" + data[i].id;
+
+            var grandChildElement1 = document.createElement("span")
+            grandChildElement1.innerHTML = data[i].title
+
+            var grandChildElement2 = document.createElement("span")
+            grandChildElement2.innerHTML = data[i].description
+
+            var grandChildElement3 = document.createElement("button")
+            grandChildElement3.innerHTML = "Done"
+            grandChildElement3.setAttribute("onclick", "deleteTask(" + data[i].id + ")")
+
+            childElement.append(grandChildElement1)
+            childElement.append(grandChildElement2)
+            childElement.append(grandChildElement3)
+
+            parentElement.append(childElement)
+        }
+
+    }
+    function callData(resp) {
+        resp.json().then(showData)
+    }
+    function getData() {
+        fetch("http://localhost:3000/todo", {
+            method: "GET",
+        }).then(callData)
+    }
+
+
+    getData();
+    function parsedData(data) {
+        console.log(data)
+        var parentElement1 = document.getElementById("mainArea")
+        var childElement1 = document.createElement("div")
+        childElement1.id = "task_" + data[data.length - 1].id;
+        var grandChildElement11 = document.createElement("span")
+        grandChildElement11.innerHTML = data[data.length - 1].title
+
+        var grandChildElement22 = document.createElement("span")
+        grandChildElement22.innerHTML = data[data.length - 1].description
+
+        var grandChildElement33 = document.createElement("button")
+        grandChildElement33.innerHTML = "Done"
+        grandChildElement33.setAttribute("onclick", "deleteTask(" + data[data.length - 1].id + ")")
+
+        childElement1.append(grandChildElement11)
+        childElement1.append(grandChildElement22)
+        childElement1.append(grandChildElement33)
+
+        parentElement1.append(childElement1)
+
+    }
+    function callback(resp) {
+        resp.json().then(parsedData)
+    }
+    function onpress() {
+        var tit = document.getElementById("title").value
+        var des = document.getElementById("description").value
+        fetch("http://localhost:3000/todo", {
+            method: "POST",
+            body: JSON.stringify({
+                title: tit+" ",
+                description: des+" "
+            }),
+            headers: {
+                "Content-Type": "application/json"
+            }
+        }).then(callback)
+    }
+
+
+</script>
+
+<body>
+    tiltle
+    <input type="text" id="title"></input>
+    description
+    <input type="text" id="description"></input>
+    <button onclick="onpress()">send</button>
+    <div id="mainArea"></div>
+
+</body>
